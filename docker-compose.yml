@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # 1. Database PostgreSQL dengan PGVector (Sesuai SRS 6.2)
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: aicademics_db
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=rahasia
+      - POSTGRES_DB=aicademics_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql # Auto-create tables
+    networks:
+      - aicademics_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d aicademics_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. Redis untuk Memory/Cache (Sesuai SRS 6.3)
+  redis:
+    image: redis:alpine
+    container_name: aicademics_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - aicademics_net
+
+volumes:
+  postgres_data:
+
+networks:
+  aicademics_net:
+    driver: bridge
