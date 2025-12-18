@@ -1,6 +1,6 @@
 import os
 import json
-import re  # <--- TAMBAHKAN INI
+import re
 from typing import List, Literal, TypedDict, Optional, Any
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,7 +12,7 @@ from langchain_postgres import PGVector
 from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
 
-# 1. SETUP
+# SETUP
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 app = FastAPI(title="AICademics API", version="Final")
@@ -50,7 +50,7 @@ llm = ChatGoogleGenerativeAI(
     convert_system_message_to_human=True
 )
 
-# 2. HELPER (PENTING AGAR TIDAK CRASH)
+# HELPER 
 def get_content(msg: Any) -> str:
     if hasattr(msg, 'content'):
         return msg.content
@@ -67,7 +67,7 @@ def extract_json(text: str) -> Optional[dict]:
     except:
         return None
 
-# 3. MODELS
+# MODELS
 class ChatRequest(BaseModel):
     user_id: str
     message: str
@@ -79,7 +79,7 @@ class ChatResponse(BaseModel):
     context_used: str
     canvas_data: Optional[dict] = None
 
-# 4. LOGIC
+# LOGIC
 class AgentState(TypedDict):
     messages: List[Any]
     context: List[str]
@@ -158,7 +158,7 @@ workflow.add_edge("retrieve", "generate")
 workflow.add_edge("generate", END)
 app_graph = workflow.compile()
 
-# 5. ENDPOINTS
+# ENDPOINTS
 @app.get("/") 
 def root():
     return {"status": "Backend Running"}
